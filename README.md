@@ -7,14 +7,14 @@ ngQueue is an AngularJS module that helps you to handle routine sync/async queue
 
 ## Getting started
 
-Include the ngSelect module with AngularJS script in your page.
+Include the ngQueue module with AngularJS script in your page.
 
 ```html
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
 <script src="http://pc035860.github.io/ngQueue/ngQueue.min.js"></script>
 ```
 
-Add `ngSelect` to your app module's dependency.
+Add `ngQueue` to your app module's dependency.
 
 ```js
 angular.module('myApp', ['ngQueue']);
