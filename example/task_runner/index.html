@@ -20,14 +20,17 @@
       <h3>ngQueue demo</h3>
       <br />
       <div class="row">
-        <div class="col-xs-4 text-center">
-          <button type="button" class="btn btn-primary" ng-click="queueSync()">queue sync</button>
+        <div class="col-xs-3 text-center">
+          <button type="button" class="btn btn-primary" ng-click="enqueueSync()">enqueue sync</button>
         </div>
-        <div class="col-xs-4 text-center">
-          <button type="button" class="btn btn-success" ng-click="queueAsync()">queue async</button>
+        <div class="col-xs-3 text-center">
+          <button type="button" class="btn btn-success" ng-click="enqueueAsync()">enqueue async</button>
         </div>
-        <div class="col-xs-4 text-center">
-          <button type="button" class="btn btn-danger" ng-click="queueRandom(10)">random x 10</button>
+        <div class="col-xs-3 text-center">
+          <button type="button" class="btn btn-danger" ng-click="enqueueRandom(10)">random x 10</button>
+        </div>
+        <div class="col-xs-3 text-center">
+          <button type="button" class="btn btn-danger" ng-click="removeAll()">remove all</button>
         </div>
       </div>
       <hr />

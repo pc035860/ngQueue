@@ -1,5 +1,5 @@
 /*jshint undef:true*/
-/*global angular*/
+/*global angular, console*/
 angular.module('ngQueue', [])
 
 .factory('$queueFactory', [
@@ -43,9 +43,17 @@ function ($q,   $window,   $timeout,   $rootScope) {
   };
 
   p.enqueue = function (todo, context, args) {
+    var task = [todo, context, args];
+
     this._queue.push([todo, context, args]);
 
     this.dequeue();
+    return task;
+  };
+
+  p.remove = function (task) {
+    var index = this._queue.indexOf(task);
+    return this._queue.splice(index, 1)[0];
   };
 
   p.dequeue = function () {

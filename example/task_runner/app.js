@@ -54,26 +54,28 @@ app.controller('MainCtrl', function($scope, $queueFactory, $q, $timeout) {
   // view queue for demostration
   $scope.vq = [];
   
-  $scope.queueSync = function () {
+  var _qTasks = [];
+
+  $scope.enqueueSync = function () {
     
     var taskId = _taskId++, 
         obj = [taskId, 'sync'];
     
     $scope.vq.push(obj);
-    _queue.enqueue(function (vqObj) {
+    _qTasks.push(_queue.enqueue(function (vqObj) {
       _removeFromVQ(vqObj);
-    }, null, [obj]);
+    }, null, [obj]));
     
   };
   
-  $scope.queueAsync = function () {
+  $scope.enqueueAsync = function () {
     
     var taskId = _taskId++, 
         duration = (Math.random() * 500 + 600) >>> 0,
         obj = [taskId, 'async', duration];
     
     $scope.vq.push(obj);
-    _queue.enqueue(function (vqObj) {
+    _qTasks.push(_queue.enqueue(function (vqObj) {
       
       var dfd = $q.defer();
       
@@ -87,23 +89,29 @@ app.controller('MainCtrl', function($scope, $queueFactory, $q, $timeout) {
       
       return dfd.promise;
       
-    }, null, [obj]);
+    }, null, [obj]));
   };
   
-  $scope.queueRandom = function (itrCount) {
+  $scope.enqueueRandom = function (itrCount) {
 
     for (var i = 0; i < itrCount; i++) {
       if (Math.random() >= 0.5) {
-        $scope.queueAsync();
+        $scope.enqueueAsync();
       }
       else {
-        $scope.queueSync();
+        $scope.enqueueSync();
       }
     }
   };
+
+  $scope.removeAll = function () {
+    angular.forEach(_qTasks, function (task) {
+      _queue.remove(task);
+    });
+  };
   
   // start with 30 random tasks
-  $scope.queueRandom(30);
+  $scope.enqueueRandom(30);
   
   function _removeFromVQ(obj) {
     $scope.vq.splice($scope.vq.indexOf(obj), 1);
