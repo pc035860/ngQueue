@@ -1,0 +1,197 @@
+/* Put your css in here */
+.container {
+  overflow: hidden;
+}
+
+.view-queue {
+  font-size: 22px;
+}
+
+.view-queue ul {
+  list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.view-queue > .row {
+  overflow: hidden;
+  height: 41px;
+  
+  -webkit-animation-duration: 600ms;
+  -moz-animation-duration: 600ms;
+  -ms-animation-duration: 600ms;
+  -o-animation-duration: 600ms;
+  animation-duration: 600ms;
+
+  -webkit-animation-fill-mode: both;
+  -moz-animation-fill-mode: both;
+  -ms-animation-fill-mode: both;
+  -o-animation-fill-mode: both;
+  animation-fill-mode: both;
+
+-webkit-transition-timing-function: cubic-bezier(0.390, 0.575, 0.565, 1.000); 
+   -moz-transition-timing-function: cubic-bezier(0.390, 0.575, 0.565, 1.000); 
+    -ms-transition-timing-function: cubic-bezier(0.390, 0.575, 0.565, 1.000); 
+     -o-transition-timing-function: cubic-bezier(0.390, 0.575, 0.565, 1.000); 
+        transition-timing-function: cubic-bezier(0.390, 0.575, 0.565, 1.000); /* easeOutSine */
+}
+
+
+.view-queue .row.ng-enter {
+  -webkit-animation-name: "grow";
+  -moz-animation-name: "grow";
+  -ms-animation-name: "grow";
+  -o-animation-name: "grow";
+  animation-name: "grow";
+}
+
+.view-queue .row.ng-leave {
+  -webkit-animation-name: "ungrow";
+  -moz-animation-name: "ungrow";
+  -ms-animation-name: "ungrow";
+  -o-animation-name: "ungrow";
+  animation-name: "ungrow";
+}
+
+.view-queue .countdown-text {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.view-queue .countdown-text .active {
+  color: #333;
+  font-weight: bold;
+}
+
+/* miss from the cdn ? */
+.label-primary {
+  background-color: #428bca;
+}
+
+.label-primary[href]:hover,
+.label-primary[href]:focus {
+  background-color: #3071a9;
+}
+
+@-webkit-keyframes "ungrow" {
+  from {
+    height: 41px;
+    opacity: 1;
+  }
+  to {
+    height: 0px;
+    opacity: 0;
+  }
+}
+
+@-moz-keyframes "ungrow" {
+  from {
+    height: 41px;
+    opacity: 1;
+  }
+  to {
+    height: 0px;
+    opacity: 0;
+  }
+}
+
+@-ms-keyframes "ungrow" {
+  from {
+    height: 41px;
+    opacity: 1;
+  }
+  to {
+    height: 0px;
+    opacity: 0;
+  }
+}
+
+@-o-keyframes "ungrow" {
+  from {
+    height: 41px;
+    opacity: 1;
+  }
+  to {
+    height: 0px;
+    opacity: 0;
+  }
+}
+
+@keyframes "ungrow" {
+  from {
+    height: 41px;
+    opacity: 1;
+  }
+  to {
+    height: 0px;
+    opacity: 0;
+  }
+}
+
+@keyframes "grow" {
+ from {
+    height: 0px;
+    opacity: 0;
+ }
+ to {
+    height: 41px;
+    opacity: 1;
+ }
+
+}
+
+@-moz-keyframes grow {
+ from {
+   height: 0px;
+   filter: alpha(opacity=0);
+   opacity: 0;
+ }
+ to {
+   height: 41px;
+   filter: alpha(opacity=100);
+   opacity: 1;
+ }
+
+}
+
+@-webkit-keyframes "grow" {
+ from {
+   height: 0px;
+   opacity: 0;
+ }
+ to {
+   height: 41px;
+   opacity: 1;
+ }
+
+}
+
+@-ms-keyframes "grow" {
+ from {
+   height: 0px;
+   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+   filter: alpha(opacity=0);
+   opacity: 0;
+ }
+ to {
+   height: 41px;
+   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+   filter: alpha(opacity=100);
+   opacity: 1;
+ }
+
+}
+
+@-o-keyframes "grow" {
+ from {
+   height: 0px;
+   filter: alpha(opacity=0);
+   opacity: 0;
+ }
+ to {
+   height: 41px;
+   filter: alpha(opacity=100);
+   opacity: 1;
+ }
+
+}
