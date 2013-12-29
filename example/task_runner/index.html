@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html ng-app="plunker">
+
+  <head>
+    <meta charset="utf-8" />
+    <title>AngularJS Plunker</title>
+    <link data-require="bootstrap-css@*" data-semver="3.0.0-rc2" rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-rc2/css/bootstrap.min.css" />
+    <script>document.write('<base href="' + document.location + '" />');</script>
+    <link rel="stylesheet" href="style.css" />
+    <script data-require="angular.js@1.1.x" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js" data-semver="1.1.5"></script>
+    <script src="../lib/ngQueue.js"></script>
+    <script src="app.js"></script>
+  </head>
+
+  <body ng-controller="MainCtrl" ng-init="asyncDelay = 300">
+    <a href="https://github.com/pc035860/ngQueue">
+      <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" />
+    </a>
+    <div class="container">
+      <h3>ngQueue demo</h3>
+      <br />
+      <div class="row">
+        <div class="col-xs-4 text-center">
+          <button type="button" class="btn btn-primary" ng-click="queueSync()">queue sync</button>
+        </div>
+        <div class="col-xs-4 text-center">
+          <button type="button" class="btn btn-success" ng-click="queueAsync()">queue async</button>
+        </div>
+        <div class="col-xs-4 text-center">
+          <button type="button" class="btn btn-danger" ng-click="queueRandom(10)">random x 10</button>
+        </div>
+      </div>
+      <hr />
+      <div class="view-queue">
+        <div class="row" ng-repeat="item in vq" ng-animate="{enter: 'ng-enter', leave: 'ng-leave'}">
+          <div class="col-xs-2 text-right">{{ item[0] }}</div>
+          <div class="col-xs-10 text-left">
+            <span class="label" ng-class="{'sync': 'label-primary', 'async': 'label-success'}[item[1]]">{{ item[1] }}</span>
+            <span ng-if="item[2]">
+              <small class="countdown-text">
+                <span ng-hide="item[3]">{{ item[2] }}</span>
+                <span class="active" ng-if="item[3]" ui-countdown="{{ item[2] }}"></span>
+                ms
+              </small>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+</html>
