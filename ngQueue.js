@@ -1,5 +1,5 @@
 /*jshint undef:true*/
-/*global angular, console*/
+/*global angular*/
 angular.module('ngQueue', [])
 
 .factory('$queueFactory', [
@@ -35,8 +35,9 @@ function ($q,   $window,   $timeout,   $rootScope) {
         };
       }
       else {
-        this._deferFunc = function (todo) { 
-          $timeout(todo, 0, true);
+        this._deferFunc = function (todo) {
+          // $timeout(todo, 0, true);
+          $timeout(todo);
         };
       }
     }
@@ -57,18 +58,6 @@ function ($q,   $window,   $timeout,   $rootScope) {
   };
 
   p.dequeue = function () {
-    if (this._deferFunc) {
-      var that = this;
-      this._deferFunc(function () {
-        that._dequeue();
-      });
-    }
-    else {
-      this._dequeue();
-    }
-  };
-
-  p._dequeue = function () {
     if (this._limit <= 0 || this._queue.length === 0) {
       return;
     }
@@ -84,7 +73,15 @@ function ($q,   $window,   $timeout,   $rootScope) {
     var that = this;
     success = error = function () {
       that._limit++;
-      that.dequeue();
+
+      if (that._deferFunc) {
+        that._deferFunc(function () {
+          that.dequeue();
+        });
+      }
+      else {
+        that.dequeue();
+      }
     };
 
     $q.when(todo.apply(context || null, args || null))
