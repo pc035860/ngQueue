@@ -1,5 +1,6 @@
 {
   "name": "ngQueue",
+  "version": "0.1.0",
   "description": "ngQueue is an AngularJS module that helps you to handle routine sync/async queue task in AngularJS with ease.",
   "main": "ngQueue.js",
   "ignore": [
@@ -8,6 +9,7 @@
     "bower_components",
     "Gruntfile.js",
     "package.json",
+    "example",
     "test",
     "tests"
   ],
