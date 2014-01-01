@@ -20,15 +20,27 @@ Add `ngQueue` to your app module's dependency.
 angular.module('myApp', ['ngQueue']);
 ```
 
+### Install with Bower
+
+```sh
+bower install ngQueue
+```
+
 ## Usage
 
-### $queueFactory
+### $queueFactory(limit, deferred)
+
+* `limit` - The maximum concurrent task for the queue. Default value `1`.
+* `deferred` - If `true`, queued tasks are padded with a very small time interval, allowlling the browser to update UIs or respond to user interactions. Default value `false`. [More about `deferred` option](#the-deferred-queue).
 
 Start with `$queueFactory` to create a queue you'll be working with.
 
 ```js
-// create a queue with concurrent taslk quota of 2
-var queue = $queueFactory(2);
+// Create a queue with concurrent task quota of 2
+var queue1 = $queueFactory(2);
+
+// Create a deferred queue
+var queue2 = $queueFactory(1, true);
 ```
 
 Now you are ready to play with `Queue` instance APIs.
@@ -37,7 +49,7 @@ Now you are ready to play with `Queue` instance APIs.
 
 #### enqueue(fn, context, args)
 
-Enqueue a `task(fn)` with specified `context(optional)` and `arguments(optional)`.
+Enqueue a `task(fn)` with specified `context(optional)` and `arguments(optional)`. Returns a task handle for you to remove the task from the queue before it gets dequeued with [`remove`](#removetaskhandle).
 
 **The task can be either asynchronous or synchronous.**
 
@@ -91,6 +103,10 @@ queue.enqueue(function () {
 });
 ```
 
+#### remove(taskHandle)
+
+Remove a task from the queue before it gets dequeued. `taskHandle` is what returned by `enqueue()`.
+
 #### clear()
 
 Clear the queue.
@@ -98,3 +114,14 @@ Clear the queue.
 #### dequeue()
 
 Try to dequeue manually. In most cases, the queue will handle all the dequeue works itself.
+
+
+## The `deferred` queue
+
+Here's a nice reading by Nicholas C. Zakas
+
+http://www.nczonline.net/blog/2013/07/09/the-case-for-setimmediate/
+
+The basic idea of the `deferred` option of `$queueFactory` is to utilize `setImmediate()` API to ease the browser freezing problems which we sometimes encountered when dealing with heavy-load tasks. Though it's not implemented on every browser, if you kindly provide a [polyfill](https://github.com/NobleJS/setImmediate), we're still good.
+
+In the condition that `ngQueue` can't find the `setImmeidate()` API, it'll use `$timeout` of AngularJS instead.
