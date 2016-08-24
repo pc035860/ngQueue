@@ -16,14 +16,14 @@ function ($q,   $window,   $timeout,   $rootScope) {
   p._limit = null;
 
   // the queue
-  p._queue = null;
+  p._queue = [];
 
   // function used for deferring
   p._deferFunc = null;
 
   p.init = function (config) {
-    this._limit = config.limit;
-    this._queue = [];
+    p._limit = config.limit;
+    p._queue = [];
 
     if (config.deferred) {
       if ($window.setImmediate) {
@@ -46,41 +46,42 @@ function ($q,   $window,   $timeout,   $rootScope) {
   p.enqueue = function (todo, context, args) {
     var task = [todo, context, args];
 
-    this._queue.push([todo, context, args]);
+    p._queue.push([todo, context, args]);
 
-    this.dequeue();
+    p.dequeue();
     return task;
   };
 
   p.remove = function (task) {
-    var index = this._queue.indexOf(task);
-    return this._queue.splice(index, 1)[0];
+    var index = p._queue.indexOf(task),
+    item = p._queue.splice(index, 1)[0];
+    return item;
   };
 
   p.dequeue = function () {
-    if (this._limit <= 0 || this._queue.length === 0) {
+    if (p._limit <= 0 || p._queue.length === 0) {
       return;
     }
 
-    this._limit--;
+    p._limit--;
 
-    var buf = this._queue.shift(),
+    var buf = p._queue.shift(),
         todo = buf[0],
         context = buf[1],
         args = buf[2],
         success, error;
 
-    var that = this;
     success = error = function () {
-      that._limit++;
+      p._limit++;
 
-      if (that._deferFunc) {
-        that._deferFunc(function () {
-          that.dequeue();
+
+      if (p._deferFunc) {
+        p._deferFunc(function () {
+          p.dequeue();
         });
       }
       else {
-        that.dequeue();
+        p.dequeue();
       }
     };
 
@@ -89,7 +90,7 @@ function ($q,   $window,   $timeout,   $rootScope) {
   };
 
   p.clear = function () {
-    this._queue.length = 0;
+    p._queue = [];
   };
 
   return function factory(limit, deferred) {
