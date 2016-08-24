@@ -85,7 +85,7 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
         todo = buf[0],
         context = buf[1],
         args = buf[2],
-        success, error;
+        success, error, always;
 
     p._list.push({id:timestamp,resolved:false});
 
@@ -101,7 +101,7 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
       else {
         p.dequeue();
       }
-    },
+    };
     always = function () {
       
       var item = $filter('filter')(p._list, {id:timestamp})[0];
@@ -111,8 +111,10 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
 
     };
 
+    /*jshint es5: true */
     $q.when(todo.apply(context || null, args || null))
     .then(success, error).finally(always);
+    /*jshint es5: false */
   };
 
   p.clear = function () {
