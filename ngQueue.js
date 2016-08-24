@@ -3,14 +3,19 @@
 angular.module('ngQueue', [])
 
 .factory('$queueFactory', [
-         '$q', '$window', '$timeout', '$rootScope',
-function ($q,   $window,   $timeout,   $rootScope) {
+         '$q', '$window', '$timeout', '$rootScope', '$filter',
+function ($q,   $window,   $timeout,   $rootScope, $filter) {
 
   var Queue = function Queue(config) {
     this.init(config);
   };
 
-  var p = Queue.prototype;
+  var p = Queue.prototype,
+  updateStats = function () {
+    p.queueTotal = p._queue.length + p._list.length;
+    p.queuePending = $filter('filter')(p._list, {resolved:false}).length + p._queue.length;
+    p.queueIdle = p.queuePending < 1;
+  };
 
   // number of simultaneously runnable tasks
   p._limit = null;
@@ -20,6 +25,13 @@ function ($q,   $window,   $timeout,   $rootScope) {
 
   // function used for deferring
   p._deferFunc = null;
+
+  p._list = [];
+
+  p.queueTotal = 0;
+  p.queuePending = 0;
+  p.queueIdle = true;
+
 
   p.init = function (config) {
     p._limit = config.limit;
@@ -48,6 +60,8 @@ function ($q,   $window,   $timeout,   $rootScope) {
 
     p._queue.push([todo, context, args]);
 
+    updateStats();
+
     p.dequeue();
     return task;
   };
@@ -55,6 +69,7 @@ function ($q,   $window,   $timeout,   $rootScope) {
   p.remove = function (task) {
     var index = p._queue.indexOf(task),
     item = p._queue.splice(index, 1)[0];
+    updateStats();
     return item;
   };
 
@@ -66,10 +81,13 @@ function ($q,   $window,   $timeout,   $rootScope) {
     p._limit--;
 
     var buf = p._queue.shift(),
+        timestamp = new Date().getTime(),
         todo = buf[0],
         context = buf[1],
         args = buf[2],
         success, error;
+
+    p._list.push({id:timestamp,resolved:false});
 
     success = error = function () {
       p._limit++;
@@ -83,14 +101,24 @@ function ($q,   $window,   $timeout,   $rootScope) {
       else {
         p.dequeue();
       }
+    },
+    always = function () {
+      
+      var item = $filter('filter')(p._list, {id:timestamp})[0];
+      item.resolved = true;
+
+      updateStats();
+
     };
 
     $q.when(todo.apply(context || null, args || null))
-    .then(success, error);
+    .then(success, error).finally(always);
   };
 
   p.clear = function () {
     p._queue = [];
+    p._list = [];
+    updateStats();
   };
 
   return function factory(limit, deferred) {
