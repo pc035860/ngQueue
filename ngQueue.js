@@ -17,6 +17,8 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
     p.queueIdle = p.queuePending < 1;
   };
 
+  p._config = {};
+
   // number of simultaneously runnable tasks
   p._limit = null;
 
@@ -34,6 +36,7 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
 
 
   p.init = function (config) {
+    p._config = config;
     p._limit = config.limit;
     p._queue = [];
 
@@ -60,7 +63,9 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
 
     p._queue.push([todo, context, args]);
 
-    updateStats();
+    if (p._config.statistics) {
+      updateStats();
+    }
 
     p.dequeue();
     return task;
@@ -69,7 +74,9 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
   p.remove = function (task) {
     var index = p._queue.indexOf(task),
     item = p._queue.splice(index, 1)[0];
-    updateStats();
+    if (p._config.statistics) {
+      updateStats();
+    }
     return item;
   };
 
@@ -87,7 +94,9 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
         args = buf[2],
         success, error, always;
 
-    p._list.push({id:timestamp,resolved:false});
+    if (p._config.statistics) {
+      p._list.push({id:timestamp,resolved:false});
+    }
 
     success = error = function () {
       p._limit++;
@@ -103,11 +112,13 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
       }
     };
     always = function () {
-      
-      var item = $filter('filter')(p._list, {id:timestamp})[0];
-      item.resolved = true;
 
-      updateStats();
+      if (p._config.statistics) {
+        var item = $filter('filter')(p._list, {id:timestamp})[0];
+        item.resolved = true;
+
+        updateStats();
+      }
 
     };
 
@@ -120,7 +131,9 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
   p.clear = function () {
     p._queue = [];
     p._list = [];
-    updateStats();
+    if (p._config.statistics) {
+      updateStats();
+    }
   };
 
   return function factory(limit, deferred) {
