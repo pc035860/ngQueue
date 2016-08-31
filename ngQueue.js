@@ -88,7 +88,7 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
     p._limit--;
 
     var buf = p._queue.shift(),
-        timestamp = new Date().getTime(),
+        timestamp = Math.random(),
         todo = buf[0],
         context = buf[1],
         args = buf[2],
