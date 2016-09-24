@@ -3,27 +3,42 @@
 angular.module('ngQueue', [])
 
 .factory('$queueFactory', [
-         '$q', '$window', '$timeout', '$rootScope',
-function ($q,   $window,   $timeout,   $rootScope) {
+         '$q', '$window', '$timeout', '$rootScope', '$filter',
+function ($q,   $window,   $timeout,   $rootScope, $filter) {
 
   var Queue = function Queue(config) {
     this.init(config);
   };
 
-  var p = Queue.prototype;
+  var p = Queue.prototype,
+  updateStats = function () {
+    p.queueTotal = p._queue.length + p._list.length;
+    p.queuePending = $filter('filter')(p._list, {resolved:false}).length + p._queue.length;
+    p.queueIdle = p.queuePending < 1;
+  };
+
+  p._config = {};
 
   // number of simultaneously runnable tasks
   p._limit = null;
 
   // the queue
-  p._queue = null;
+  p._queue = [];
 
   // function used for deferring
   p._deferFunc = null;
 
+  p._list = [];
+
+  p.queueTotal = 0;
+  p.queuePending = 0;
+  p.queueIdle = true;
+
+
   p.init = function (config) {
-    this._limit = config.limit;
-    this._queue = [];
+    p._config = config;
+    p._limit = config.limit;
+    p._queue = [];
 
     if (config.deferred) {
       if ($window.setImmediate) {
@@ -46,50 +61,79 @@ function ($q,   $window,   $timeout,   $rootScope) {
   p.enqueue = function (todo, context, args) {
     var task = [todo, context, args];
 
-    this._queue.push([todo, context, args]);
+    p._queue.push([todo, context, args]);
 
-    this.dequeue();
+    if (p._config.statistics) {
+      updateStats();
+    }
+
+    p.dequeue();
     return task;
   };
 
   p.remove = function (task) {
-    var index = this._queue.indexOf(task);
-    return this._queue.splice(index, 1)[0];
+    var index = p._queue.indexOf(task),
+    item = p._queue.splice(index, 1)[0];
+    if (p._config.statistics) {
+      updateStats();
+    }
+    return item;
   };
 
   p.dequeue = function () {
-    if (this._limit <= 0 || this._queue.length === 0) {
+    if (p._limit <= 0 || p._queue.length === 0) {
       return;
     }
 
-    this._limit--;
+    p._limit--;
 
-    var buf = this._queue.shift(),
+    var buf = p._queue.shift(),
+        timestamp = Math.random(),
         todo = buf[0],
         context = buf[1],
         args = buf[2],
-        success, error;
+        success, error, always;
 
-    var that = this;
+    if (p._config.statistics) {
+      p._list.push({id:timestamp,resolved:false});
+    }
+
     success = error = function () {
-      that._limit++;
+      p._limit++;
 
-      if (that._deferFunc) {
-        that._deferFunc(function () {
-          that.dequeue();
+
+      if (p._deferFunc) {
+        p._deferFunc(function () {
+          p.dequeue();
         });
       }
       else {
-        that.dequeue();
+        p.dequeue();
       }
     };
+    always = function () {
 
+      if (p._config.statistics) {
+        var item = $filter('filter')(p._list, {id:timestamp})[0];
+        item.resolved = true;
+
+        updateStats();
+      }
+
+    };
+
+    /*jshint es5: true */
     $q.when(todo.apply(context || null, args || null))
-    .then(success, error);
+    .then(success, error).finally(always);
+    /*jshint es5: false */
   };
 
   p.clear = function () {
-    this._queue.length = 0;
+    p._queue = [];
+    p._list = [];
+    if (p._config.statistics) {
+      updateStats();
+    }
   };
 
   return function factory(limit, deferred) {
