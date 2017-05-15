@@ -4,18 +4,13 @@ angular.module('ngQueue', [])
 
 .factory('$queueFactory', [
          '$q', '$window', '$timeout', '$rootScope', '$filter',
-function ($q,   $window,   $timeout,   $rootScope, $filter) {
+function ($q,   $window,   $timeout,   $rootScope,   $filter) {
 
   var Queue = function Queue(config) {
     this.init(config);
   };
 
-  var p = Queue.prototype,
-  updateStats = function () {
-    p.queueTotal = p._queue.length + p._list.length;
-    p.queuePending = $filter('filter')(p._list, {resolved:false}).length + p._queue.length;
-    p.queueIdle = p.queuePending < 1;
-  };
+  var p = Queue.prototype;
 
   p._config = {};
 
@@ -36,9 +31,13 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
 
 
   p.init = function (config) {
-    p._config = config;
-    p._limit = config.limit;
-    p._queue = [];
+    this._config = config;
+    this._limit = config.limit;
+    this._queue = [];
+
+    if (this._config.statistics) {
+      this._list = [];
+    }
 
     if (config.deferred) {
       if ($window.setImmediate) {
@@ -61,79 +60,82 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
   p.enqueue = function (todo, context, args) {
     var task = [todo, context, args];
 
-    p._queue.push([todo, context, args]);
+    this._queue.push([todo, context, args]);
 
-    if (p._config.statistics) {
-      updateStats();
+    if (this._config.statistics) {
+      this.updateStats();
     }
 
-    p.dequeue();
+    this.dequeue();
     return task;
   };
 
   p.remove = function (task) {
-    var index = p._queue.indexOf(task),
-    item = p._queue.splice(index, 1)[0];
-    if (p._config.statistics) {
-      updateStats();
+    var index = this._queue.indexOf(task),
+    item = this._queue.splice(index, 1)[0];
+    if (this._config.statistics) {
+      this.updateStats();
     }
     return item;
   };
 
   p.dequeue = function () {
-    if (p._limit <= 0 || p._queue.length === 0) {
+    if (this._limit <= 0 || this._queue.length === 0) {
       return;
     }
 
-    p._limit--;
+    this._limit--;
 
-    var buf = p._queue.shift(),
-        timestamp = Math.random(),
+    var that = this,
+        buf = this._queue.shift(),
+        randNum = Math.random(),
         todo = buf[0],
         context = buf[1],
         args = buf[2],
-        success, error, always;
+        success, error;
 
-    if (p._config.statistics) {
-      p._list.push({id:timestamp,resolved:false});
+    if (this._config.statistics) {
+      this._list.push({ id: randNum, resolved: false });
     }
 
     success = error = function () {
-      p._limit++;
+      that._limit++;
 
+      if (that._config.statistics) {
+        var item = $filter('filter')(that._list, function (v) { return v.id === randNum; })[0];
+        item.resolved = true;
 
-      if (p._deferFunc) {
-        p._deferFunc(function () {
-          p.dequeue();
+        that.updateStats();
+      }
+
+      if (that._deferFunc) {
+        that._deferFunc(function () {
+          that.dequeue();
         });
       }
       else {
-        p.dequeue();
+        that.dequeue();
       }
-    };
-    always = function () {
-
-      if (p._config.statistics) {
-        var item = $filter('filter')(p._list, {id:timestamp})[0];
-        item.resolved = true;
-
-        updateStats();
-      }
-
     };
 
     /*jshint es5: true */
     $q.when(todo.apply(context || null, args || null))
-    .then(success, error).finally(always);
+    .then(success, error);
     /*jshint es5: false */
   };
 
   p.clear = function () {
-    p._queue = [];
-    p._list = [];
-    if (p._config.statistics) {
-      updateStats();
+    this._queue = [];
+    this._list = [];
+    if (this._config.statistics) {
+      this.updateStats();
     }
+  };
+
+  p.updateStats = function () {
+    this.queueTotal = this._queue.length + this._list.length;
+    this.queuePending = $filter('filter')(this._list, function (v) { return v.resolved === false; }).length + this._queue.length;
+    this.queueIdle = this.queuePending < 1;
   };
 
   return function factory(limit, deferred) {
@@ -145,13 +147,20 @@ function ($q,   $window,   $timeout,   $rootScope, $filter) {
     else {
       limit = limit || 1;
 
-      if (angular.isUndefined(deferred)) {
-        deferred = false;
+      if (angular.isObject(deferred)) {
+        config = deferred;
+        config.limit = config.limit || limit;
       }
-      config = {
-        limit: limit,
-        deferred: !!deferred
-      };
+      else {
+        if (angular.isUndefined(deferred)) {
+          deferred = false;
+        }
+
+        config = {
+          limit: limit,
+          deferred: !!deferred
+        };
+      }
     }
 
     return new Queue(config);
