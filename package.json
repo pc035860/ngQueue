@@ -1,8 +1,8 @@
 {
-  "name": "ngQueue",
+  "name": "ng-queue",
   "version": "0.2.0",
   "description": "ngQueue is an AngularJS module that helps you to handle routine sync/async queue task in AngularJS with ease.",
-  "main": "index.js",
+  "main": "ngQeueu.min.js",
   "directories": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,14 +18,16 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "connect-livereload": "~0.3.0",
     "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.0",
-    "grunt-contrib-jshint": "~0.4.3",
-    "grunt-contrib-watch": "~0.5.0",
+    "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-connect": "~0.3.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-jshint": "~0.4.3",
+    "grunt-contrib-uglify": "^3.3.0",
+    "grunt-contrib-watch": "~0.5.0",
     "grunt-newer": "~0.5.1",
     "grunt-open": "~0.2.2",
-    "connect-livereload": "~0.3.0",
-    "grunt-contrib-copy": "~0.5.0"
+    "grunt-umd": "^3.0.0"
   }
 }

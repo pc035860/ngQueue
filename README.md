@@ -26,6 +26,16 @@ angular.module('myApp', ['ngQueue']);
 bower install ngQueue
 ```
 
+then import the module with `<script>` tag.
+
+### Install with NPM
+
+```sh
+npm install ng-queue
+```
+
+then `import`/`require` the module somewhere in your entry point file.
+
 ## Usage
 
 ### $queueFactory(limit, deferred)
