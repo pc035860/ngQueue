@@ -17,9 +17,21 @@ module.exports = function(grunt) {
       beforeuglify: ['<%= pkg.name %>.js'],
       gruntfile: ['Gruntfile.js']
     },
+    umd: {
+      build: {
+        options: {
+          src: '<%= pkg.name %>.js',
+          dest: '<%= pkg.name %>.umd.js',
+
+          deps: {
+            'default': ['angular']
+          }
+        }
+      }
+    },
     uglify: {
       build: {
-        src: '<%= pkg.name %>.js',
+        src: '<%= pkg.name %>.umd.js',
         dest: '<%= pkg.name %>.min.js'
       },
       options: {
@@ -32,6 +44,9 @@ module.exports = function(grunt) {
           'author: <%= pkg.author %>\n' + 
           '<%= pkg.repository.url %> */\n'
       }
+    },
+    clean: {
+      build: ['<%= pkg.name %>.umd.js']
     },
     copy: {
       example: {
@@ -90,9 +105,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-newer');
   grunt.loadNpmTasks('grunt-open');
+  grunt.loadNpmTasks('grunt-umd');
+  grunt.loadNpmTasks('grunt-contrib-clean');
 
   grunt.registerTask('example', ['connect:livereload', 'open', 'watch']);
 
-  grunt.registerTask('default', ['jshint:beforeuglify', 'uglify']);
+  grunt.registerTask('default', ['jshint:beforeuglify', 'umd', 'uglify', 'clean']);
 };
 
