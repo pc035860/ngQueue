@@ -36,7 +36,7 @@ module.exports = function(grunt) {
       },
       options: {
         mangle: true,
-        compress: true,
+        compress: {},
         banner: 
           '/*! <%= pkg.name %>\n' + 
           'version: <%= pkg.version %>\n' +
