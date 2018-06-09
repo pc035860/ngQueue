@@ -25,37 +25,21 @@ function ($q,   $window,   $timeout,   $rootScope) {
     this._limit = config.limit;
     this._queue = [];
 
-    if ((typeof config.deferred === 'boolean' && config.deferred) ||
-        (typeof config.deferred === 'number' && config.deferred >= 0)) {
-      
-      this._deferFunc = (function () {
-        var deferChunkDurationLimit = Number(config.deferred),
-            setImmediate = $window.setImmediate || function (todo) { $timeout(todo, 0, true); },
-            lastChunk = null;
-
-        var getTime = function () {
-          if ($window.performance && $window.performance.now) {
-            return $window.performance.now();
-          }
-          return +(new Date());
+    if (config.deferred) {
+      if ($window.setImmediate) {
+        this._deferFunc = function (todo) {
+          $window.setImmediate(function () {
+            todo();
+            $rootScope.$apply();
+          });
         };
-
-        return function (next) {
-          var now = getTime();
-
-          if (lastChunk === null || getTime() - lastChunk >= deferChunkDurationLimit) {
-            lastChunk = now;
-
-            setImmediate(function () {
-              next();
-              $rootScope.$apply();
-            });
-          }
-          else {
-            next();
-          }
+      }
+      else {
+        this._deferFunc = function (todo) {
+          // $timeout(todo, 0, true);
+          $timeout(todo);
         };
-      }());
+      }
     }
   };
 
@@ -122,7 +106,7 @@ function ($q,   $window,   $timeout,   $rootScope) {
       }
       config = {
         limit: limit,
-        deferred: deferred
+        deferred: !!deferred
       };
     }
 
