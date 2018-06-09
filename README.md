@@ -31,7 +31,7 @@ bower install ngQueue
 ### $queueFactory(limit, deferred)
 
 * `limit` - The maximum concurrent task for the queue. Default value `1`.
-* `deferred` - If `true` or a number, queued tasks will be splitted into chunks of sets with the given number as sets execution duration limit, allowing the browser to update UIs or respond to user interactions. Default value `false`. [More about `deferred` option](#the-deferred-queue).
+* `deferred` - If `true`, queued tasks are padded with a very small time interval, allowlling the browser to update UIs or respond to user interactions. Default value `false`. [More about `deferred` option](#the-deferred-queue).
 
 Start with `$queueFactory` to create a queue you'll be working with.
 
@@ -118,10 +118,9 @@ Try to dequeue manually. In most cases, the queue will handle all the dequeue wo
 
 ## The `deferred` queue
 
-Here are some nice readings by Nicholas C. Zakas
+Here's a nice reading by Nicholas C. Zakas
 
-- http://www.nczonline.net/blog/2009/08/11/timed-array-processing-in-javascript/
-- http://www.nczonline.net/blog/2013/07/09/the-case-for-setimmediate/
+http://www.nczonline.net/blog/2013/07/09/the-case-for-setimmediate/
 
 The basic idea of the `deferred` option of `$queueFactory` is to utilize `setImmediate()` API to ease the browser freezing problems which we sometimes encountered when dealing with heavy-load tasks. Though it's not implemented on every browser, if you kindly provide a [polyfill](https://github.com/NobleJS/setImmediate), we're still good.
 
